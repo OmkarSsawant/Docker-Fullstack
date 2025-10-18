@@ -1,0 +1,88 @@
+PASSWORD=os_1234567
+DB_URL=postgresql://postgres:$(PASSWORD)@db:5432/postgres
+
+
+.PHONY: setup-docker-network
+setup-docker-network:
+		docker network create frontend
+		docker network create backend
+
+
+.PHONY: build-all
+build-all:
+		docker build -t react-frontend:v0.1 ./clock/.
+	    docker build -t node-api:v0.1 ./node-api/.
+		docker build -t go-api:v0.1 ./go-api/.
+.PHONY: run-all
+run-all:
+		docker run -d \
+		--name db \
+		--network backend \
+		--restart unless-stopped \
+		-v pgdata:/var/lib/postgresql/data \
+		-p 5432:5432 \
+		-e POSTGRES_PASSWORD=$(PASSWORD) \
+		postgres:15.1-alpine
+		
+        
+
+		docker run -d \
+		--name node-server \
+		--network backend \
+		-e DB_URI=$(DB_URL) \
+		-e PORT=3000 \
+		-p 3000:3000 \
+		--link=db \
+		--restart unless-stopped \
+		node-api:v0.1
+		
+        
+		
+		docker run  -d \
+		--name go-server \
+		--network backend \
+		-e DB_URI=$(DB_URL) \
+		-e PORT=8080 \
+		-p 8080:8080 \
+		--link=db \
+		--restart unless-stopped \
+		go-api:v0.1
+		
+        
+
+		docker run -d \
+		--name  react-frontend \
+		--network frontend \
+		-e PORT=4173 \
+		-p 4173:4173	 \
+		--link=node-server \
+		--link=go-server \
+		--restart unless-stopped \
+		react-frontend:v0.1
+
+
+
+		
+.PHONY: docker-stop
+docker-stop:
+		docker stop db
+		docker stop react-frontend
+		docker stop node-server
+		docker stop go-server
+
+
+
+
+.PHONY: docker-clean
+docker-clean:
+		docker rm db
+		docker rm node-server
+		docker rm go-server
+		docker rm react-frontend
+
+
+
+.PHONY: reset-builds
+reset-builds:
+		docker-stop
+		docker-clean

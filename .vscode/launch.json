@@ -1,0 +1,36 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            
+            "type": "node",
+            "request": "attach",
+            "name": "Docker : Attach Node Api Debugger",
+            "localRoot": "${workspaceFolder}/node-api",
+            "remoteRoot": "/app",
+            "port": 9229
+        },
+
+        {
+            "type": "go",
+            "debugAdapter":"dlv-dap",
+            "request": "attach",
+            "name": "Docker : Attach Go Api Debugger",
+            "mode":"remote",
+            "remotePath":"/app",
+            "port": 4000,
+            "substitutePath":[
+                {
+                    "from":"${workspaceFolder}/go-api",
+                    "to":"/app"
+
+                }
+            ]
+        }
+
+    ]
+}

@@ -1,0 +1,25 @@
+name: fullstack-docker
+services: 
+    node-server:
+        command:
+            - npm
+            - run
+            - docker-debug
+        ports:
+            - "3000:3000"
+            - "9229:9229"
+    go-server:
+        command:
+            - "dlv"
+            - "debug"
+            - "/app/."
+            - "--listen=:4000"
+            - "--headless=true"
+            - "--log=true"
+            - "--log-output=debugger,debuglineer,gdbwrite,lldbout,rpc"
+            - "--accept-multiclient"
+            - "--continue"
+            - "--api-version=2"
+        ports:
+            - "8080:8080"
+            - "4000:4000"

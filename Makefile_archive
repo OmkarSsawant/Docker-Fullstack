@@ -1,0 +1,52 @@
+PASSWORD=os1234567
+DB_URL=postgresql://postgres:$(PASSWORD)@localhost:5432/postgres
+
+
+
+
+
+
+.PHONY: start-pg
+start-pg: 
+		  docker run -it \
+		  --name postgres-db \
+		  -v pgdata:/var/lib/postgresql/data2 \
+		  -e POSTGRES_PASSWORD=$(PASSWORD) \
+		  -e POSTGRES_DB=mytime \
+		  -p 5432:5432 \
+		  postgres:15.1-alpine
+
+
+.PHONY: build-node-api
+build-node-api: 
+			docker build -t node-api-d \
+			./node-api/.
+
+.PHONY: start-node-api
+start-node-api: 
+			docker run -it \
+			-e DB_URI=$(DB_URL) \
+			-e PORT=3000 \
+			-e NODE_ENV=production \
+			-p 3000:3000 \
+			 node-api-d
+
+
+.PHONY: build-go-server
+build-go-server: 
+			docker build -t go-api-d \
+			./go-api/.
+
+.PHONY: run-go-server
+run-go-server: 
+			docker run -it \
+			-e DB_URI=$(DB_URL) \
+			-e PORT=8080 \
+			-e GO_ENV=production \
+			-p 8080:8080 \
+			go-api-d
+
+.PHONY: build-fe
+build-fe:
+	docker build -t react-fe \
+	./clock/.

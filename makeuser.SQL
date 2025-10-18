@@ -1,0 +1,6 @@
+CREATE USER test_user WITH ENCRYPTED PASSWORD 'pass@1234';
+
+CREATE USER m_super_user WITH SUPERUSER LOGIN PASSWORD 'm_super_user@1234';
+
+--FIX
+ALTER USER postgres WITH PASSWORD 'new_pased';
