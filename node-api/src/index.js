@@ -7,6 +7,8 @@ const app  =express();
 
 app.use(morgan('tiny'))
 
+
+
 app.get('/time',async (req,res)=> {
     res.setHeader('Access-Control-Allow-Origin','*')
     const time =await getDBTime();
